@@ -5,16 +5,12 @@ from django.contrib.auth.models import User
 from store.models import Category, Product, Courier
 from pathlib import Path
 import random
-import shutil
 
 class Command(BaseCommand):
-    help = 'Seed database with sample categories, products, and couriers'
+    help = 'Seed database with sample categories and products'
 
     def handle(self, *args, **options):
         static_img = Path(settings.BASE_DIR) / 'static' / 'img'
-        media_root = Path(settings.MEDIA_ROOT)
-        (media_root / 'categories').mkdir(parents=True, exist_ok=True)
-        (media_root / 'products').mkdir(parents=True, exist_ok=True)
 
         cat_data = [
             ("Men's Clothing", 'mens-clothing', 'cat-1.jpg'),
@@ -32,10 +28,8 @@ class Command(BaseCommand):
             )
             if created:
                 src = static_img / img_file
-                dst = media_root / 'categories' / img_file
                 if src.exists():
-                    shutil.copy2(src, dst)
-                    with open(dst, 'rb') as f:
+                    with open(src, 'rb') as f:
                         cat.image.save(img_file, File(f))
                 self.stdout.write(f'  Created category: {name}')
 
@@ -68,10 +62,8 @@ class Command(BaseCommand):
             )
             if created:
                 src = static_img / img_file
-                dst = media_root / 'products' / img_file
                 if src.exists():
-                    shutil.copy2(src, dst)
-                    with open(dst, 'rb') as f:
+                    with open(src, 'rb') as f:
                         prod.image.save(img_file, File(f))
                 self.stdout.write(f'  Created product: {name}')
 
