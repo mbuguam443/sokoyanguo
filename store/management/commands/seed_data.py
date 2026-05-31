@@ -1,15 +1,20 @@
 from django.core.management.base import BaseCommand
 from django.core.files import File
+from django.conf import settings
 from django.contrib.auth.models import User
-from store.models import Category, Product
+from store.models import Category, Product, Courier
 from pathlib import Path
 import random
+import shutil
 
 class Command(BaseCommand):
-    help = 'Seed database with sample categories and products'
+    help = 'Seed database with sample categories, products, and couriers'
 
     def handle(self, *args, **options):
-        media_dir = Path(r'C:\Users\mbugu\OneDrive\Desktop\OpenCode\Ecommerce\media')
+        static_img = Path(settings.BASE_DIR) / 'static' / 'img'
+        media_root = Path(settings.MEDIA_ROOT)
+        (media_root / 'categories').mkdir(parents=True, exist_ok=True)
+        (media_root / 'products').mkdir(parents=True, exist_ok=True)
 
         cat_data = [
             ("Men's Clothing", 'mens-clothing', 'cat-1.jpg'),
@@ -20,27 +25,29 @@ class Command(BaseCommand):
             ('Shoes', 'shoes', 'cat-6.jpg'),
         ]
 
-        for name, slug, img in cat_data:
+        for name, slug, img_file in cat_data:
             cat, created = Category.objects.get_or_create(
                 slug=slug,
                 defaults={'name': name, 'is_active': True}
             )
             if created:
-                img_path = media_dir / 'products' / img
-                if img_path.exists():
-                    with open(img_path, 'rb') as f:
-                        cat.image.save(img, File(f))
+                src = static_img / img_file
+                dst = media_root / 'categories' / img_file
+                if src.exists():
+                    shutil.copy2(src, dst)
+                    with open(dst, 'rb') as f:
+                        cat.image.save(img_file, File(f))
                 self.stdout.write(f'  Created category: {name}')
 
         product_data = [
-            ('Classic Fit Formal Shirt', 'classic-fit-formal-shirt', "Men's Clothing", 34.99, 49.99, 'product-1.jpg'),
+            ('Classic Fit Formal Shirt', 'classic-fit-formal-shirt', "Men's Clothing", 1, 49.99, 'product-1.jpg'),
             ('Slim Fit Casual Shirt', 'slim-fit-casual-shirt', "Men's Clothing", 29.99, 44.99, 'product-2.jpg'),
             ('Summer Floral Dress', 'summer-floral-dress', "Women's Clothing", 49.99, 69.99, 'product-3.jpg'),
             ('Elegant Evening Gown', 'elegant-evening-gown', "Women's Clothing", 89.99, 129.99, 'product-4.jpg'),
             ('Kids Cotton Polo Shirt', 'kids-cotton-polo-shirt', 'Baby & Kids', 19.99, 29.99, 'product-5.jpg'),
             ('Leather Crossbody Bag', 'leather-crossbody-bag', 'Accessories', 39.99, 59.99, 'product-6.jpg'),
             ('Canvas Tote Bag', 'canvas-tote-bag', 'Bags', 24.99, 39.99, 'product-7.jpg'),
-            ('Running Sneakers', 'running-sneakers', 'Shoes', 59.99, 89.99, 'product-8.jpg'),
+            ('Running Sneakers', 'running-sneakers', 'Shoes', 1, 89.99, 'product-8.jpg'),
         ]
 
         for name, slug, cat_name, price, compare_price, img_file in product_data:
@@ -60,10 +67,21 @@ class Command(BaseCommand):
                 }
             )
             if created:
-                img_path = media_dir / 'products' / img_file
-                if img_path.exists():
-                    with open(img_path, 'rb') as f:
+                src = static_img / img_file
+                dst = media_root / 'products' / img_file
+                if src.exists():
+                    shutil.copy2(src, dst)
+                    with open(dst, 'rb') as f:
                         prod.image.save(img_file, File(f))
                 self.stdout.write(f'  Created product: {name}')
+
+        couriers = ['Boda Boda Rider', 'Wells Fargo', 'G4S', 'Aramex', 'FedEx', 'DHL', 'Kenyaco', 'Pickup Station', 'Other']
+        for name in couriers:
+            Courier.objects.get_or_create(name=name)
+        self.stdout.write(f'  Created {len(couriers)} couriers')
+
+        if not User.objects.filter(is_superuser=True).exists():
+            User.objects.create_superuser('admin', 'admin@sokoyanguo.co.ke', 'admin123')
+            self.stdout.write('  Created superuser: admin / admin123')
 
         self.stdout.write(self.style.SUCCESS('Database seeded successfully!'))
