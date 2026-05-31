@@ -1,0 +1,39 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}{{ action }} Category{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0"><a href="{% url 'dashboard:category_list' %}">Categories</a></p><p class="m-0 px-2">-</p><p class="m-0">{{ action }}</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-header bg-primary text-white"><h5 class="mb-0">{{ action }} Category</h5></div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ category.name|default:'' }}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Slug</label>
+                    <input type="text" name="slug" class="form-control" value="{{ category.slug|default:'' }}" placeholder="Leave blank to auto-generate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Image</label>
+                <input type="file" name="image" class="form-control-file">
+                {% if category.image %}<small class="text-muted">Current: {{ category.image.name }}</small>{% endif %}
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" {% if category.is_active or not category %}checked{% endif %}>
+                    <label class="custom-control-label" for="is_active">Active</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Category</button>
+            <a href="{% url 'dashboard:category_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

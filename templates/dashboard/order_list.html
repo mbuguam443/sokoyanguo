@@ -1,0 +1,49 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Orders{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0">Orders</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="font-weight-semi-bold mb-0">All Orders</h4>
+    <div>
+        <a href="{% url 'dashboard:order_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}">Pending</a>
+        <a href="?status=processing" class="btn btn-sm {% if status_filter == 'processing' %}btn-primary{% else %}btn-outline-primary{% endif %}">Processing</a>
+        <a href="?status=shipped" class="btn btn-sm {% if status_filter == 'shipped' %}btn-primary{% else %}btn-outline-primary{% endif %}">Shipped</a>
+        <a href="?status=delivered" class="btn btn-sm {% if status_filter == 'delivered' %}btn-primary{% else %}btn-outline-primary{% endif %}">Delivered</a>
+        <a href="?status=cancelled" class="btn btn-sm {% if status_filter == 'cancelled' %}btn-primary{% else %}btn-outline-primary{% endif %}">Cancelled</a>
+    </div>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.first_name }} {{ order.last_name }}</td>
+                <td>{{ order.email }}</td>
+                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                <td><span class="badge badge-{% if order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% elif order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}secondary{% endif %}">{{ order.get_status_display }}</span></td>
+                <td>Ksh {{ order.total }}</td>
+                <td><a href="{% url 'dashboard:order_detail' order.id %}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center py-4">No orders found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

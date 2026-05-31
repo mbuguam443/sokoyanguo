@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order - SokoyaNguo{% endblock %}
+
+{% block page_header %}
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Track Order</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{% url 'store:home' %}">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Track Order</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5 justify-content-center">
+        <div class="col-lg-8">
+            {% if not order %}
+            <div class="card border-secondary mb-5">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-search text-muted mb-3" style="font-size: 48px;"></i>
+                    <h5 class="mb-3">Track Your Order</h5>
+                    <p class="text-muted mb-4">Enter your order number and email to track your delivery.</p>
+                    <form method="GET" class="mx-auto" style="max-width: 400px;">
+                        <div class="form-group">
+                            <input type="text" name="order_id" class="form-control" placeholder="Order #" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" placeholder="Email used at checkout" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Track Order</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card border-secondary mb-4">
+                <div class="card-header bg-secondary">
+                    <h4 class="font-weight-semi-bold m-0">Order #{{ order.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Status</h6>
+                            {% if order.status == 'pending' %}<span class="badge badge-secondary p-2">{{ order.get_status_display }}</span>
+                            {% elif order.status == 'processing' %}<span class="badge badge-info p-2">{{ order.get_status_display }}</span>
+                            {% elif order.status == 'shipped' %}<span class="badge badge-primary p-2">{{ order.get_status_display }}</span>
+                            {% elif order.status == 'delivered' %}<span class="badge badge-success p-2">{{ order.get_status_display }}</span>
+                            {% elif order.status == 'cancelled' %}<span class="badge badge-danger p-2">{{ order.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 text-md-right">
+                            <h6>Total</h6>
+                            <p class="font-weight-bold">Ksh {{ order.total }}</p>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 8px;">
+                        {% if order.status == 'cancelled' %}
+                        <div class="progress-bar bg-danger" style="width: 100%"></div>
+                        {% elif order.status == 'pending' %}
+                        <div class="progress-bar" style="width: 10%"></div>
+                        {% elif order.status == 'processing' %}
+                        <div class="progress-bar" style="width: 35%"></div>
+                        {% elif order.status == 'shipped' %}
+                        <div class="progress-bar" style="width: 65%"></div>
+                        {% elif order.status == 'delivered' %}
+                        <div class="progress-bar bg-success" style="width: 100%"></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-3">
+                            <i class="fas fa-check-circle {% if order.status != 'cancelled' %}text-success{% else %}text-muted{% endif %}"></i>
+                            <small class="d-block mt-1">Confirmed</small>
+                        </div>
+                        <div class="col-3">
+                            <i class="fas fa-cog {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}text-success{% else %}text-muted{% endif %}"></i>
+                            <small class="d-block mt-1">Processing</small>
+                        </div>
+                        <div class="col-3">
+                            <i class="fas fa-truck {% if order.status == 'shipped' or order.status == 'delivered' %}text-success{% else %}text-muted{% endif %}"></i>
+                            <small class="d-block mt-1">Shipped</small>
+                        </div>
+                        <div class="col-3">
+                            <i class="fas fa-home {% if order.status == 'delivered' %}text-success{% else %}text-muted{% endif %}"></i>
+                            <small class="d-block mt-1">Delivered</small>
+                        </div>
+                    </div>
+
+                    {% if order.tracking_number %}
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h6>Delivery Information</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Courier</small>
+                                <strong>{{ order.courier_name }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Tracking Number</small>
+                                <strong>{{ order.tracking_number }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Estimated Delivery</small>
+                                <strong>{{ order.estimated_delivery|date:"d M Y"|default:"TBD" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if order.status == 'shipped' %}
+                    <form method="POST" class="text-center mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="confirm_delivery" value="1">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fa fa-check-circle mr-2"></i>Confirm Delivery
+                        </button>
+                        <p class="text-muted small mt-2">Click this button once you have received your order.</p>
+                    </form>
+                    {% endif %}
+
+                    <h6 class="mt-4 mb-2">Order Items</h6>
+                    {% for item in order.items.all %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <span>{{ item.product_name }} x{{ item.quantity }}</span>
+                        <span>Ksh {{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+
+                    <h6 class="mt-4 mb-2">Shipping To</h6>
+                    <p class="mb-1">{{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}</p>
+                    <p>{{ order.city }}, {{ order.state }} {{ order.zip_code }}, {{ order.country }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

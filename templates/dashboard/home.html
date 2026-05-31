@@ -1,0 +1,276 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Products</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ product_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-box fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Categories</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ category_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-tags fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ order_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-shopping-cart fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_orders }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Pending Reviews</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ review_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-star fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-left-secondary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Unread Messages</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ unread_messages }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa fa-envelope fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Products by Category</h5></div>
+            <div class="card-body"><canvas id="categoryChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Monthly Revenue</h5></div>
+            <div class="card-body"><canvas id="revenueChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Orders (Last 14 Days)</h5></div>
+            <div class="card-body"><canvas id="ordersChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Revenue (Last 14 Days)</h5></div>
+            <div class="card-body"><canvas id="dailyRevenueChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_orders %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td><a href="{% url 'dashboard:order_detail' order.id %}">#{{ order.id }}</a></td>
+                                <td>{{ order.first_name }} {{ order.last_name }}</td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                <td><span class="badge badge-{% if order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% elif order.status == 'delivered' %}success{% else %}secondary{% endif %}">{{ order.get_status_display }}</span></td>
+                                <td>Ksh {{ order.total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No orders yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-dark text-white">
+            <div class="card-body text-center">
+                <h5 class="mb-0">Total Revenue: <strong>Ksh {{ total_revenue|floatformat:2 }}</strong></h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block dashboard_extra_js %}
+<script>
+var catLabels = {{ cat_labels|safe }};
+var catCounts = {{ cat_counts|safe }};
+var odLabels = {{ od_labels|safe }};
+var odCounts = {{ od_counts|safe }};
+var odRev = {{ od_revenue|safe }};
+var monthlyLabels = {{ monthly_labels|safe }};
+var monthlyRev = {{ monthly_revenue|safe }};
+
+var primary = '#007bff';
+var teal = '#20c997';
+
+new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+        labels: catLabels,
+        datasets: [{
+            label: 'Products',
+            data: catCounts,
+            backgroundColor: 'rgba(0,123,255,0.5)',
+            borderColor: primary,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+        labels: monthlyLabels,
+        datasets: [{
+            label: 'Revenue',
+            data: monthlyRev,
+            backgroundColor: 'rgba(32,201,151,0.5)',
+            borderColor: teal,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return 'Ksh ' + v; } } } }
+    }
+});
+
+new Chart(document.getElementById('ordersChart'), {
+    type: 'line',
+    data: {
+        labels: odLabels,
+        datasets: [{
+            label: 'Orders',
+            data: odCounts,
+            backgroundColor: 'rgba(0,123,255,0.1)',
+            borderColor: primary,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: primary
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+
+new Chart(document.getElementById('dailyRevenueChart'), {
+    type: 'line',
+    data: {
+        labels: odLabels,
+        datasets: [{
+            label: 'Revenue',
+            data: odRev,
+            backgroundColor: 'rgba(32,201,151,0.1)',
+            borderColor: teal,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: teal
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return 'Ksh ' + v; } } } }
+    }
+});
+</script>
+{% endblock %}

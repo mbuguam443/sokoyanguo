@@ -1,0 +1,49 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row bg-secondary py-2 px-xl-5">
+        <div class="col-lg-6 d-none d-lg-block">
+            <div class="d-inline-flex align-items-center">
+                <a class="text-dark" href="">FAQs</a>
+                <span class="text-muted px-2">|</span>
+                <a class="text-dark" href="">Help</a>
+                <span class="text-muted px-2">|</span>
+                <a class="text-dark" href="">Support</a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center text-lg-right">
+            <div class="d-inline-flex align-items-center">
+                <a class="text-dark px-2" href=""><i class="fab fa-facebook-f"></i></a>
+                <a class="text-dark px-2" href=""><i class="fab fa-twitter"></i></a>
+                <a class="text-dark px-2" href=""><i class="fab fa-linkedin-in"></i></a>
+                <a class="text-dark px-2" href=""><i class="fab fa-instagram"></i></a>
+                <a class="text-dark pl-2" href=""><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-center py-3 px-xl-5">
+        <div class="col-lg-3 d-none d-lg-block">
+            <a href="{% url 'store:home' %}" class="text-decoration-none">
+                <img src="{% static 'img/logo.svg' %}" alt="EShopper" height="50">
+            </a>
+        </div>
+        <div class="col-lg-6 col-6 text-left">
+            <form action="{% url 'store:shop' %}" method="GET">
+                <div class="input-group position-relative">
+                    <input type="text" name="q" class="form-control" placeholder="Search for products" id="search-input" autocomplete="off">
+                    <div class="input-group-append">
+                        <button class="input-group-text bg-transparent text-primary" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="search-results" class="position-absolute bg-white w-100 shadow-sm" style="top: 100%; left: 0; z-index: 1000; display: none; max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0 0 4px 4px;"></div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-3 col-6 text-right">
+            <a href="{% url 'store:cart' %}" class="btn border">
+                <i class="fas fa-shopping-cart text-primary"></i>
+                <span class="badge">{{ cart_item_count }}</span>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Newsletter Subscribers{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0">Subscribers</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Subscribed</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subscriber in subscribers %}
+            <tr>
+                <td>{{ subscriber.email }}</td>
+                <td>{{ subscriber.name|default:'-' }}</td>
+                <td>{{ subscriber.subscribed_at|date:"M d, Y" }}</td>
+                <td>{% if subscriber.is_active %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-times text-danger"></i>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center py-4">No subscribers found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

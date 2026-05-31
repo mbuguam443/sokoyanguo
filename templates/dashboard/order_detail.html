@@ -1,0 +1,109 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Order #{{ order.id }}{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0"><a href="{% url 'dashboard:order_list' %}">Orders</a></p><p class="m-0 px-2">-</p><p class="m-0">#{{ order.id }}</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Order Items</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr><th>Product</th><th>Price</th><th>Qty</th><th>Subtotal</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td>Ksh {{ item.product_price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>Ksh {{ item.subtotal }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="3" class="text-right">Subtotal:</td><td>Ksh {{ order.subtotal }}</td></tr>
+                            <tr><td colspan="3" class="text-right">Shipping:</td><td>Ksh {{ order.shipping_cost }}</td></tr>
+                            <tr><td colspan="3" class="text-right font-weight-bold">Total:</td><td class="font-weight-bold">Ksh {{ order.total }}</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Status</h5></div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <select name="status" class="form-control">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                            <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                    <button type="submit" name="update_status" class="btn btn-primary btn-block">Update Status</button>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white"><h5 class="mb-0">Tracking</h5></div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Courier</label>
+                        <select name="courier_name" class="form-control">
+                            <option value="">-- Select --</option>
+                            {% for c in couriers %}
+                            <option value="{{ c.name }}" {% if order.courier_name == c.name %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tracking Number</label>
+                        <input type="text" name="tracking_number" class="form-control" value="{{ order.tracking_number }}" placeholder="e.g. SN123456789">
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Delivery</label>
+                        <input type="date" name="estimated_delivery" class="form-control" value="{{ order.estimated_delivery|date:'Y-m-d' }}">
+                    </div>
+                    <button type="submit" name="update_tracking" class="btn btn-success btn-block">Update Tracking</button>
+                </form>
+                {% if order.tracking_number %}
+                <hr>
+                <p class="mb-1"><strong>Customer tracking link:</strong></p>
+                <a href="{% url 'store:track_order_detail' order.id %}?email={{ order.email|urlencode }}" target="_blank" class="text-success">
+                    View tracking page <i class="fa fa-external-link-alt"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Customer</h5></div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ order.first_name }} {{ order.last_name }}</strong></p>
+                <p class="mb-1">{{ order.email }}</p>
+                <p class="mb-0">{{ order.phone }}</p>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Shipping Address</h5></div>
+            <div class="card-body">
+                <p class="mb-1">{{ order.address_line1 }}</p>
+                {% if order.address_line2 %}<p class="mb-1">{{ order.address_line2 }}</p>{% endif %}
+                <p class="mb-1">{{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                <p class="mb-0">{{ order.country }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

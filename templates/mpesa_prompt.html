@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - SokoyaNguo{% endblock %}
+
+{% block page_header %}
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">M-Pesa Payment</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{% url 'store:home' %}">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Payment</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5 justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-secondary mb-5">
+                <div class="card-header bg-secondary border-0">
+                    <h4 class="font-weight-semi-bold m-0">Complete Your Payment</h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-mobile-alt text-primary" style="font-size: 64px;"></i>
+                    </div>
+                    <h5 class="mb-3">Check Your Phone</h5>
+                    <p class="mb-1">A payment request of <strong>Ksh {{ order.total }}</strong> has been sent to your M-Pesa.</p>
+                    <p class="mb-3">Enter your M-Pesa PIN to complete the transaction.</p>
+                    <div id="payment-status" class="alert alert-info">
+                        <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
+                        Waiting for payment confirmation...
+                    </div>
+                    <div id="payment-success" class="alert alert-success d-none">
+                        <i class="fa fa-check-circle mr-2"></i> Payment received! <a href="{% url 'store:order_complete' order.id %}" class="alert-link">View your order</a>
+                    </div>
+                    <div id="payment-failed" class="alert alert-danger d-none">
+                        <i class="fa fa-times-circle mr-2"></i> Payment was not completed.
+                    </div>
+                    <hr>
+                    <p class="mb-0 small text-muted">Order #{{ order.id }} — Ksh {{ order.total }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var pollInterval = setInterval(function() {
+    fetch('{% url "store:mpesa_status" order.id %}')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.status === 'processing') {
+                clearInterval(pollInterval);
+                document.getElementById('payment-status').classList.add('d-none');
+                document.getElementById('payment-success').classList.remove('d-none');
+            } else if (data.status === 'cancelled') {
+                clearInterval(pollInterval);
+                document.getElementById('payment-status').classList.add('d-none');
+                document.getElementById('payment-failed').classList.remove('d-none');
+            }
+        });
+}, 3000);
+
+setTimeout(function() {
+    clearInterval(pollInterval);
+    var status = document.getElementById('payment-status');
+    if (!status.classList.contains('d-none')) {
+        status.classList.add('d-none');
+        document.getElementById('payment-failed').classList.remove('d-none');
+        document.getElementById('payment-failed').innerHTML = '<i class="fa fa-times-circle mr-2"></i> Payment timed out. <a href="{% url "store:contact" %}" class="alert-link">Contact us</a> for assistance.';
+    }
+}, 120000);
+</script>
+{% endblock %}

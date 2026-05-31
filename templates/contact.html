@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - SokoyaNguo{% endblock %}
+
+{% block page_header %}
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Contact Us</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{% url 'store:home' %}">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Contact</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title px-5"><span class="px-2">Contact For Any Queries</span></h2>
+    </div>
+    <div class="row px-xl-5">
+        <div class="col-lg-7 mb-5">
+            <div class="contact-form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="control-group">
+                        {{ form.name }}
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        {{ form.email }}
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        {{ form.subject }}
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        {{ form.message }}
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary py-2 px-4" type="submit">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-5">
+            <h5 class="font-weight-semi-bold mb-3">Get In Touch</h5>
+            <p>We'd love to hear from you! Whether you have a question about our products, need help with an order, or just want to share feedback, our team is here to help.</p>
+            <div class="d-flex flex-column mb-3">
+                <h5 class="font-weight-semi-bold mb-3">Nairobi Store</h5>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Moi Avenue, Nairobi, Kenya</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@sokoyanguo.co.ke</p>
+                <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+254 712 345 678</p>
+            </div>
+            <div class="d-flex flex-column">
+                <h5 class="font-weight-semi-bold mb-3">Mombasa Store</h5>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Kenyatta Avenue, Mombasa, Kenya</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>mombasa@sokoyanguo.co.ke</p>
+                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+254 720 987 654</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

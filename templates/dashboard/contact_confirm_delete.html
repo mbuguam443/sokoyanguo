@@ -1,0 +1,20 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Delete Message{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0"><a href="{% url 'dashboard:contact_list' %}">Contacts</a></p><p class="m-0 px-2">-</p><p class="m-0">Delete</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fa fa-exclamation-triangle text-danger fa-4x mb-4"></i>
+        <h4>Are you sure you want to delete this message?</h4>
+        <p class="text-muted">From: {{ contact.name }} ({{ contact.email }})</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'dashboard:contact_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Contact Messages{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0">Contacts</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Read</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr class="{% if not contact.is_read %}font-weight-bold{% endif %}">
+                <td>{{ contact.name }}</td>
+                <td>{{ contact.email }}</td>
+                <td>{{ contact.subject }}</td>
+                <td>{{ contact.message|truncatewords:15 }}</td>
+                <td>{{ contact.created_at|date:"M d, Y" }}</td>
+                <td>{% if contact.is_read %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-times text-danger"></i>{% endif %}</td>
+                <td>
+                    {% if not contact.is_read %}
+                    <a href="{% url 'dashboard:contact_mark_read' contact.id %}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
+                    {% endif %}
+                    <a href="{% url 'dashboard:contact_delete' contact.id %}" class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center py-4">No messages found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

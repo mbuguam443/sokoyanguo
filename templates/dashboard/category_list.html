@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Categories{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0">Categories</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="font-weight-semi-bold mb-0">All Categories</h4>
+    <a href="{% url 'dashboard:category_add' %}" class="btn btn-primary">Add Category</a>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Products</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td>{% if category.image %}<img src="{{ category.image.url }}" alt="" style="width: 50px; height: 50px; object-fit: cover;">{% else %}<span class="text-muted">No image</span>{% endif %}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.slug }}</td>
+                <td>{{ category.product_count }}</td>
+                <td>{% if category.is_active %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-times text-danger"></i>{% endif %}</td>
+                <td>
+                    <a href="{% url 'dashboard:category_edit' category.id %}" class="btn btn-sm btn-info"><i class="fa fa-edit"></i></a>
+                    <a href="{% url 'dashboard:category_delete' category.id %}" class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center py-4">No categories found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

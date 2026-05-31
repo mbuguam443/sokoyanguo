@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}SokoyaNguo - Premium Fashion Store{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        @keyframes whatsapp-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        a[href*="wa.me"] { animation: whatsapp-pulse 2s infinite; }
+    </style>
+</head>
+<body>
+
+{% include 'topbar.html' %}
+
+{% include 'navbar.html' %}
+
+{% block page_header %}{% endblock %}
+
+{% if messages %}
+<div class="container pt-3">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'info' %}info{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% include 'footer.html' %}
+
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+<a href="https://wa.me/254712345678" target="_blank" class="btn btn-success d-flex align-items-center justify-content-center" style="position: fixed; bottom: 90px; right: 15px; width: 50px; height: 50px; border-radius: 50%; z-index: 999; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    <i class="fab fa-whatsapp" style="font-size: 24px;"></i>
+</a>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'lib/easing/easing.min.js' %}"></script>
+<script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+<script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+<script src="{% static 'mail/contact.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var searchInput = $('#search-input');
+    var searchResults = $('#search-results');
+    var timer = null;
+
+    if (!searchInput.length) return;
+
+    searchInput.on('input', function() {
+        clearTimeout(timer);
+        var q = $(this).val().trim();
+        if (q.length < 2) {
+            searchResults.empty().hide();
+            return;
+        }
+        timer = setTimeout(function() {
+            $.getJSON('/search-autocomplete/', {q: q}, function(data) {
+                if (!data.results.length) {
+                    searchResults.html('<div class="p-3 text-muted text-center">No products found</div>').show();
+                    return;
+                }
+                var html = '';
+                $.each(data.results, function(i, p) {
+                    html += '<a href="/product/' + p.slug + '/" class="d-flex align-items-center p-2 text-dark text-decoration-none" style="border-bottom: 1px solid #f0f0f0;">';
+                    html += '  <img src="' + p.image + '" alt="" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">';
+                    html += '  <div><div class="font-weight-semi-bold">' + p.name + '</div><small class="text-primary">Ksh ' + p.price + '</small></div>';
+                    html += '</a>';
+                });
+                searchResults.html(html).show();
+            }).fail(function() {
+                searchResults.empty().hide();
+            });
+        }, 300);
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.input-group').length) {
+            searchResults.hide();
+        }
+    });
+});
+</script>
+{% endblock %}
+</body>
+</html>

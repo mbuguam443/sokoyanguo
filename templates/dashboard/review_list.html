@@ -1,0 +1,47 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Reviews{% endblock %}
+{% block dashboard_breadcrumb %}<p class="m-0 px-2">-</p><p class="m-0">Reviews</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Product</th>
+                <th>User</th>
+                <th>Rating</th>
+                <th>Review</th>
+                <th>Date</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in reviews %}
+            <tr>
+                <td>{{ review.product.name }}</td>
+                <td>{{ review.name }}</td>
+                <td>
+                    {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= review.rating %}<i class="fa fa-star text-warning"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ review.review|truncatewords:20 }}</td>
+                <td>{{ review.created_at|date:"M d, Y" }}</td>
+                <td>{% if review.is_approved %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-times text-danger"></i>{% endif %}</td>
+                <td>
+                    {% if not review.is_approved %}
+                    <a href="{% url 'dashboard:review_approve' review.id %}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
+                    {% endif %}
+                    <a href="{% url 'dashboard:review_delete' review.id %}" class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center py-4">No reviews found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
