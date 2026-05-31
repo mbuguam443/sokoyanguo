@@ -48,6 +48,10 @@
                         <h6 class="font-weight-medium">Ksh {{ order.shipping_cost }}</h6>
                     </div>
                     <div class="d-flex justify-content-between">
+                        <h6 class="font-weight-medium">Payment</h6>
+                        <h6 class="font-weight-medium">{% if order.is_paid %}<span class="text-success">Paid</span>{% else %}<span class="text-warning">Pending</span>{% endif %} — {{ order.get_payment_method_display }}</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
                         <h5 class="font-weight-bold">Total</h5>
                         <h5 class="font-weight-bold">Ksh {{ order.total }}</h5>
                     </div>

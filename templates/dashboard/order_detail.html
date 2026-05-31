@@ -39,6 +39,15 @@
         <div class="card mb-4">
             <div class="card-header bg-primary text-white"><h5 class="mb-0">Status</h5></div>
             <div class="card-body">
+                <p class="mb-2">
+                    <strong>Payment:</strong>
+                    {% if order.is_paid %}
+                    <span class="badge badge-success">Paid{% if order.paid_at %} ({{ order.paid_at|date:"M d, Y H:i" }}){% endif %}</span>
+                    {% else %}
+                    <span class="badge badge-danger">Unpaid</span>
+                    {% endif %}
+                    &mdash; {{ order.get_payment_method_display }}
+                </p>
                 <form method="POST">
                     {% csrf_token %}
                     <div class="form-group">
@@ -52,6 +61,12 @@
                     </div>
                     <button type="submit" name="update_status" class="btn btn-primary btn-block">Update Status</button>
                 </form>
+                {% if not order.is_paid %}
+                <form method="POST" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" name="mark_paid" class="btn btn-success btn-block">Mark as Paid</button>
+                </form>
+                {% endif %}
             </div>
         </div>
         <div class="card mb-4">

@@ -24,6 +24,7 @@
                 <th>Customer</th>
                 <th>Email</th>
                 <th>Date</th>
+                <th>Paid</th>
                 <th>Status</th>
                 <th>Total</th>
                 <th>Actions</th>
@@ -36,6 +37,7 @@
                 <td>{{ order.first_name }} {{ order.last_name }}</td>
                 <td>{{ order.email }}</td>
                 <td>{{ order.created_at|date:"M d, Y" }}</td>
+                <td>{% if order.is_paid %}<i class="fa fa-check-circle text-success" title="Paid"></i>{% else %}<i class="fa fa-times-circle text-danger" title="Unpaid"></i>{% endif %}</td>
                 <td><span class="badge badge-{% if order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% elif order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}secondary{% endif %}">{{ order.get_status_display }}</span></td>
                 <td>Ksh {{ order.total }}</td>
                 <td><a href="{% url 'dashboard:order_detail' order.id %}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a></td>

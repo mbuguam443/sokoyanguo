@@ -44,7 +44,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6>Status</h6>
                             {% if order.status == 'pending' %}<span class="badge badge-secondary p-2">{{ order.get_status_display }}</span>
                             {% elif order.status == 'processing' %}<span class="badge badge-info p-2">{{ order.get_status_display }}</span>
@@ -53,7 +53,15 @@
                             {% elif order.status == 'cancelled' %}<span class="badge badge-danger p-2">{{ order.get_status_display }}</span>
                             {% endif %}
                         </div>
-                        <div class="col-md-6 text-md-right">
+                        <div class="col-md-4">
+                            <h6>Payment</h6>
+                            {% if order.is_paid %}
+                            <span class="badge badge-success p-2">Paid</span>
+                            {% else %}
+                            <span class="badge badge-warning p-2">Unpaid</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-md-right">
                             <h6>Total</h6>
                             <p class="font-weight-bold">Ksh {{ order.total }}</p>
                         </div>

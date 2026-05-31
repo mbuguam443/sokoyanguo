@@ -298,6 +298,8 @@ def mpesa_callback(request):
                             txn_id = item.get('Value', '')
                             break
                     order.mpesa_transaction_id = txn_id
+                    order.is_paid = True
+                    order.paid_at = timezone.now()
                     order.status = 'processing'
                     order.save()
                     if order.email:

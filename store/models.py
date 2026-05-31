@@ -120,6 +120,8 @@ class Order(models.Model):
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=10.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    is_paid = models.BooleanField(default=False)
+    paid_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
     tracking_number = models.CharField(max_length=200, blank=True)
     courier_name = models.CharField(max_length=200, blank=True)

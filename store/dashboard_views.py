@@ -224,6 +224,29 @@ def order_detail(request, order_id):
                     pass
             return redirect('dashboard:order_detail', order_id=order.id)
 
+        if 'mark_paid' in request.POST:
+            if not order.is_paid:
+                order.is_paid = True
+                order.paid_at = timezone.now()
+                order.save()
+                messages.success(request, f'Order #{order.id} marked as paid!')
+                if order.email:
+                    try:
+                        send_mail(
+                            subject=f'Payment Confirmed - SokoyaNguo (#{order.id})',
+                            message=f'Hi {order.first_name},\n\n'
+                                    f'Your payment of Ksh {order.total} has been confirmed!\n'
+                                    f'Order #: {order.id}\n'
+                                    f'Payment: {order.get_payment_method_display()}\n'
+                                    f'Status: {order.get_status_display()}\n\n'
+                                    f'Thank you for shopping with SokoyaNguo!',
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=[order.email],
+                        )
+                    except Exception:
+                        pass
+            return redirect('dashboard:order_detail', order_id=order.id)
+
         if 'update_tracking' in request.POST:
             had_tracking = bool(order.tracking_number)
             order.courier_name = request.POST.get('courier_name', '')
